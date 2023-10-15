@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Deltion Roosters</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="action_group">Klas</string>
+    <string name="action_today">Vandaag</string>
+
+
+</resources>
