@@ -1,6 +1,7 @@
 package com.wbrk.deltionroosters
 
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View.GONE
@@ -24,6 +25,9 @@ class MainActivity : AppCompatActivity() {
     private var day: Int = 0
     private var fetching: Boolean = false
 
+    private var dayFetchDelay: Int = 0
+    private var fetchDelayed: Boolean = false
+
     private var timesList = mutableListOf<String>()
     private var titlesList = mutableListOf<String>()
     private var locationsList = mutableListOf<String>()
@@ -35,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        setSupportActionBar(findViewById(R.id.toolbar))
+        setSupportActionBar(binding.toolbar)
 
         val recyclerView: RecyclerView = findViewById(R.id.list_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -47,17 +51,23 @@ class MainActivity : AppCompatActivity() {
             if (!fetching) {
                 day += 1
                 renderDayRoster(day)
+            } else {
+                dayFetchDelay += 1
+                fetchDelayed = true
             }
         }
         findViewById<Button>(R.id.prev_button).setOnClickListener {
             if (!fetching) {
                 day -= 1
                 renderDayRoster(day)
+            } else {
+                dayFetchDelay -= 1
+                fetchDelayed = true
             }
         }
     }
 
-    fun renderDayRoster(day: Int) {
+    fun renderDayRoster(dayToFetch: Int) {
         fetching = true
         timesList.clear()
         titlesList.clear()
@@ -66,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         runOnUiThread { findViewById<ProgressBar>(R.id.progress).visibility = VISIBLE }
         val api = api.getInstance().create(apiInterface::class.java)
         GlobalScope.launch {
-            val result = api.getRosterDay("SD1A", day)
+            val result = api.getRosterDay("SD1A", dayToFetch)
             if (result.isSuccessful) {
                 for (day in result.body()!!.data) {
                     for (leshour in day.items) {
@@ -83,7 +93,14 @@ class MainActivity : AppCompatActivity() {
                 findViewById<ProgressBar>(R.id.progress).visibility = GONE
             }
             notifyDataChange()
-            fetching = false
+            if (fetchDelayed) {
+                day += dayFetchDelay
+                dayFetchDelay = 0
+                fetchDelayed = false
+                renderDayRoster(day)
+            } else {
+                fetching = false
+            }
         }
     }
 
