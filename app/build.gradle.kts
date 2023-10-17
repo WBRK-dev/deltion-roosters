@@ -14,11 +14,17 @@ android {
         versionCode = 1
         versionName = "0.2"
 
+        var baseurl = "https://deltion-roosters-api.vercel.app/"
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
+        debug {
+            var baseurl = "https://deltion-roosters-api.vercel.app/"
+        }
         release {
+            var baseurl = "https://deltion-roosters-api.vercel.app/"
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
