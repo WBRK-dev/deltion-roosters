@@ -5,5 +5,8 @@
     <string name="action_group">Klas</string>
     <string name="action_today">Vandaag</string>
 
+    <string name="group_activity">Klas</string>
+    <string name="action_groups_refresh">Refresh</string>
+
 
 </resources>

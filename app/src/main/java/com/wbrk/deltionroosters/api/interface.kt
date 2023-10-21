@@ -10,4 +10,7 @@ interface apiInterface {
 
     @GET("/roster")
     suspend fun getRosterWeek(@Query("group") group: String, @Query("week") week: Int) : Response<Week>
+
+    @GET("/groups")
+    suspend fun getGroups() : Response<Groups>
 }

@@ -33,6 +33,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+        <activity android:name=".KlasActivity"
+            android:exported="true"
+            android:label="@string/group_activity"
+            android:theme="@style/Theme.DeltionRoosters"
+            android:screenOrientation="portrait"
+            android:windowActionBarOverlay="false">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

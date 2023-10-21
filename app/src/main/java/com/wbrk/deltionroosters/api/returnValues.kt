@@ -16,3 +16,7 @@ data class LesItem(
     val v: String,
     val r: String
 )
+
+data class Groups(
+    val data: List<String>
+)

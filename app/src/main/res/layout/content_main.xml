@@ -62,7 +62,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/list_view"
-        tools:visibility="gone" />
+        android:visibility="gone" />
 
     <View
         android:id="@+id/divider3"

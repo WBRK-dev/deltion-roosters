@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class RecyclerAdapter (private var times: List<String>, private var titles: List<String>, private var locations: List<String>) :
-RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
+class MainRecyclerAdapter (private var times: List<String>, private var titles: List<String>, private var locations: List<String>) :
+RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         val itemTime: TextView

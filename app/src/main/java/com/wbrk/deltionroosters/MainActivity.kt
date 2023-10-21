@@ -13,14 +13,16 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.wbrk.deltionroosters.api.SharedPref
-import com.wbrk.deltionroosters.api.Week
 import com.wbrk.deltionroosters.api.api
 import com.wbrk.deltionroosters.api.apiInterface
 import com.wbrk.deltionroosters.databinding.ActivityMainBinding
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import retrofit2.Response
+import java.io.File
+import java.nio.charset.Charset
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,12 +35,13 @@ class MainActivity : AppCompatActivity() {
     private var fetchDelayed: Boolean = false
 
     private var url: String = ""
+    private var group: String = "none"
 
     private var timesList = mutableListOf<String>()
     private var titlesList = mutableListOf<String>()
     private var locationsList = mutableListOf<String>()
 
-    private val recyclerAdapter = RecyclerAdapter(timesList, titlesList, locationsList)
+    private val recyclerAdapter = MainRecyclerAdapter(timesList, titlesList, locationsList)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,15 +52,29 @@ class MainActivity : AppCompatActivity() {
 
         val sharedPref = SharedPref(this)
         url = sharedPref.read("customapi", "").toString()
+        group = sharedPref.read("selectedGroup", "none").toString()
 
         val recyclerView: RecyclerView = findViewById(R.id.list_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = recyclerAdapter
 
-        val group = sharedPref.read("group", "none").toString()
+        val file = File(filesDir, "selectedGroups")
+        file.createNewFile()
+        file.writeBytes("['SD1A', 'SD1B', 'SD1C']".toByteArray())
 
         if (group !== "none") {
             renderDayRoster(group, day)
+        } else {
+            val gson = Gson()
+            val type = object : TypeToken<List<String?>?>() {}.type
+            val file = File(filesDir, "selectedGroups")
+            file.createNewFile()
+            val selectedGroupsString = file.readBytes().toString(Charset.defaultCharset())
+            var selectedGroups: List<String> = mutableListOf()
+            if (selectedGroupsString.isNotEmpty()) { selectedGroups = gson.fromJson(selectedGroupsString, type) }
+            val klasSelector = KlasSelector("test3", selectedGroups, this)
+            klasSelector.show(supportFragmentManager, "KLAS_SELECT_DIALOG")
+            klasSelector.setOnDismissFunction { group = sharedPref.read("selectedGroup", "none").toString(); renderDayRoster(group, day) }
         }
 
         findViewById<Button>(R.id.next_button).setOnClickListener {
@@ -143,7 +160,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val sharedPref = SharedPref(this)
-        val group = sharedPref.read("group", "none").toString()
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -156,7 +172,16 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
             R.id.action_group -> {
-                KlasSelector(group).show(supportFragmentManager, "KLAS_SELECT_DIALOG")
+                val gson = Gson()
+                val type = object : TypeToken<List<String?>?>() {}.type
+                val file = File(filesDir, "selectedGroups")
+                file.createNewFile()
+                val selectedGroupsString = file.readBytes().toString(Charset.defaultCharset())
+                var selectedGroups: List<String> = mutableListOf()
+                if (selectedGroupsString.isNotEmpty()) { selectedGroups = gson.fromJson(selectedGroupsString, type) }
+                val klasSelector = KlasSelector(group, selectedGroups, this)
+                klasSelector.show(supportFragmentManager, "KLAS_SELECT_DIALOG")
+                klasSelector.setOnDismissFunction { group = sharedPref.read("selectedGroup", "none").toString(); renderDayRoster(group, day) }
                 true
             }
             R.id.action_settings -> {
